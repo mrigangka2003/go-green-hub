@@ -61,18 +61,7 @@ export default function SignIn() {
                         </Button>
                     </form>
 
-                    <div className="mt-6 text-center">
-                        <p className="text-sm text-muted-foreground">
-                            Don’t have an account?
-                            <Button
-                                variant="link"
-                                className="ml-1 p-0 h-auto font-normal"
-                                onClick={() => navigate("/auth?mode=signup")}
-                            >
-                                Sign up
-                            </Button>
-                        </p>
-                    </div>
+                    {/* will add google login button here */}
                 </CardContent>
             </Card>
         </>

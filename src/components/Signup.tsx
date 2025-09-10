@@ -110,19 +110,7 @@ export default function SignUp() {
                             Create Account
                         </Button>
                     </form>
-
-                    <div className="mt-6 text-center">
-                        <p className="text-sm text-muted-foreground">
-                            Already have an account?
-                            <Button
-                                variant="link"
-                                className="ml-1 p-0 h-auto font-normal"
-                                onClick={() => navigate("/auth?mode=signin")}
-                            >
-                                Sign in
-                            </Button>
-                        </p>
-                    </div>
+                    {/* Will add google login button here */}
                 </CardContent>
             </Card>
         </>

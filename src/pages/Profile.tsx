@@ -1,459 +1,401 @@
-import React, { useState, ChangeEvent } from "react";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from "react";
 import {
-    Camera,
     User,
     Mail,
     Phone,
     MapPin,
+    Shield,
     LogOut,
-    Trash,
-    Plus,
-    Home,
-    Building,
-    Edit,
+    Camera,
     Save,
     X,
+    Eye,
+    EyeOff,
     Lock,
 } from "lucide-react";
 
-/* ---------- colour tokens ---------- */
-const COLOR = {
-    primary: "#38B000", // brand green
-    secondary: "#F0EAD2", // cream cards
-    bg: "#EBF2FA", // page background
-    ink: "#141414", // high-contrast text
-    muted: "#6C584C", // low-contrast text / borders
-};
-
-/* ---------- helpers ---------- */
-const style = {
-    bg: `bg-[#EBF2FA]`,
-    sidebar: `bg-[#38B000] text-white`,
-    card: `bg-[#F0EAD2] border border-[#6C584C]/20 rounded-2xl shadow-lg`,
-    textPrimary: `text-[#141414]`,
-    textSecondary: `text-[#6C584C]`,
-    accent: `bg-[#38B000] hover:bg-[#38B000]/90 text-white`,
-    border: `border border-[#6C584C]/30`,
-    focus: `focus:ring-2 focus:ring-[#38B000] focus:outline-none`,
-};
-
-/* ---------- types ---------- */
-interface Address {
-    locality: string;
-    city: string;
-    state: string;
-    pin: string;
-    landmark: string;
+// Define TypeScript interfaces
+interface ProfileData {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    type: "org" | "emp";
+    profilePic?: string;
 }
 
-/* ---------- page ---------- */
-export default function ProfilePage() {
-    const [avatar, setAvatar] = useState<string | null>(null);
-    const [name, setName] = useState("John Abraham");
-    const [email, setEmail] = useState("john@example.com");
-    const [phone, setPhone] = useState("+91 98765 43210");
-    const [phone2, setPhone2] = useState("");
+interface PasswordData {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+}
+
+const Profile = () => {
+    const [profile, setProfile] = useState<ProfileData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
     const [isEditing, setIsEditing] = useState(false);
-    const [showPasswordForm, setShowPasswordForm] = useState(false);
-    const [addresses, setAddresses] = useState<Address[]>([
-        {
-            locality: "Andheri East",
-            city: "Mumbai",
-            state: "Maharashtra",
-            pin: "400069",
-            landmark: "Near Metro Station",
-        },
-    ]);
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState({
+        current: false,
+        new: false,
+        confirm: false
+    });
+    const [formData, setFormData] = useState<Partial<ProfileData>>({});
+    const [passwordData, setPasswordData] = useState<PasswordData>({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+    });
 
-    const handlePhoto = (e: ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) setAvatar(URL.createObjectURL(file));
+    // Mock profile data
+    const mockProfile: ProfileData = {
+        id: "user-123",
+        name: "John Doe",
+        email: "john.doe@example.com",
+        phone: "+1 (555) 123-4567",
+        address: "123 Main St, New York, NY 10001",
+        type: "emp",
+        profilePic: ""
     };
 
-    const addAddress = () =>
-        setAddresses([
-            ...addresses,
-            { locality: "", city: "", state: "", pin: "", landmark: "" },
-        ]);
+    useEffect(() => {
+        // Simulate API fetch with mock data
+        const fetchProfile = async () => {
+            try {
+                setLoading(true);
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                setProfile(mockProfile);
+                setFormData(mockProfile);
+            } catch (err: any) {
+                setError(err.message || "Something went wrong");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const removeAddress = (index: number) =>
-        setAddresses(addresses.filter((_, i) => i !== index));
+        fetchProfile();
+    }, []);
 
-    const updateAddress = (
-        index: number,
-        field: keyof Address,
-        value: string
-    ) => {
-        const next = [...addresses];
-        next[index][field] = value;
-        setAddresses(next);
+    const handleInputChange = (field: keyof ProfileData, value: string) => {
+        setFormData({ ...formData, [field]: value });
     };
 
-    const toggleEdit = () => {
-        setIsEditing(!isEditing);
-        if (isEditing) {
-            // Save logic would go here
-            console.log("Saving changes...");
+    const handlePasswordChange = (field: keyof PasswordData, value: string) => {
+        setPasswordData({ ...passwordData, [field]: value });
+    };
+
+    const handleSave = async () => {
+        try {
+            // Simulate API update
+            await new Promise(resolve => setTimeout(resolve, 500));
+            setProfile(formData as ProfileData);
+            setIsEditing(false);
+        } catch (err) {
+            setError("Failed to update profile");
         }
     };
 
-    const togglePasswordForm = () => {
-        setShowPasswordForm(!showPasswordForm);
+    const handlePasswordSave = async () => {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setError("New passwords don't match");
+            return;
+        }
+
+        try {
+            // Simulate API update
+            await new Promise(resolve => setTimeout(resolve, 500));
+            setPasswordData({
+                currentPassword: "",
+                newPassword: "",
+                confirmPassword: ""
+            });
+            setIsChangingPassword(false);
+            setError("");
+            alert("Password changed successfully!");
+        } catch (err) {
+            setError("Failed to change password");
+        }
     };
 
-    /* ---------- render ---------- */
+    const handleLogout = () => {
+        // Replace with actual logout logic
+        alert("Logged out successfully!");
+    };
+
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfile(prev => prev ? {
+                    ...prev,
+                    profilePic: reader.result as string
+                } : null);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    if (loading) return (
+        <div className="flex justify-center items-center min-h-screen bg-[#EBF2FA]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#38B000]"></div>
+        </div>
+    );
+
+    if (error) return (
+        <div className="flex justify-center items-center min-h-screen bg-[#EBF2FA]">
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+                <p className="text-red-600 font-medium">{error}</p>
+                <button
+                    onClick={() => setError("")}
+                    className="mt-4 bg-[#38B000] text-white px-4 py-2 rounded-md hover:bg-[#2E8B00] transition"
+                >
+                    Try Again
+                </button>
+            </div>
+        </div>
+    );
+
+    if (!profile) return null;
+
     return (
-        <div className={`min-h-screen ${style.bg} flex`}>
-            {/* ------ desktop sidebar ------ */}
-            <aside
-                className={`hidden md:flex flex-col items-center w-64 p-6 ${style.sidebar} shrink-0`}
-            >
-                <label className="relative cursor-pointer mb-8">
-                    <input
-                        type="file"
-                        accept="image/*"
-                        className="sr-only"
-                        onChange={handlePhoto}
-                    />
-                    <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/90 shadow-lg grid place-items-center bg-white/20">
-                        {avatar ? (
-                            <img
-                                src={avatar}
-                                alt="avatar"
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <User className="w-10 h-10 text-white/80" />
-                        )}
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 p-2 rounded-full bg-white shadow-md">
-                        <Camera className="w-4 h-4" style={{ color: COLOR.primary }} />
-                    </div>
-                </label>
-
-                <nav className="flex flex-col gap-3 text-sm font-semibold w-full">
-                    {["Dashboard", "Reviews", "My Bookings", "Profile"].map((item) => (
-                        <a
-                            key={item}
-                            className="px-3 py-2 rounded-lg hover:bg-white/10 transition cursor-pointer"
-                        >
-                            {item}
-                        </a>
-                    ))}
-                    <a className="mt-auto flex items-center gap-2 cursor-pointer hover:bg-white/10 px-3 py-2 rounded-lg">
-                        <LogOut className="w-4 h-4" /> Logout
-                    </a>
-                </nav>
-            </aside>
-
-            {/* ------ content ------ */}
-            <main className="flex-1 p-6 md:p-10 space-y-6">
-                {/* Header with edit button */}
-                <div className="flex justify-between items-center">
-                    <h1 className="text-2xl font-bold" style={{ color: COLOR.ink }}>
-                        Profile Settings
-                    </h1>
-                    <Button
-                        onClick={toggleEdit}
-                        className={`gap-2 ${isEditing ? "bg-[#6C584C] hover:bg-[#6C584C]/90" : style.accent
-                            }`}
-                    >
-                        {isEditing ? (
-                            <>
-                                <Save size={16} /> Save Changes
-                            </>
-                        ) : (
-                            <>
-                                <Edit size={16} /> Edit Profile
-                            </>
-                        )}
-                    </Button>
-                </div>
-
-                {/* mobile avatar */}
-                <div className="md:hidden flex justify-center mb-4">
-                    <label className="relative cursor-pointer">
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="sr-only"
-                            onChange={handlePhoto}
-                        />
-                        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-lg grid place-items-center bg-white">
-                            {avatar ? (
-                                <img
-                                    src={avatar}
-                                    alt="avatar"
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <User className="w-8 h-8" style={{ color: COLOR.muted }} />
+        <div className="min-h-screen bg-[#EBF2FA] py-8 px-4">
+            <div className="max-w-3xl mx-auto">
+                {/* Profile Card */}
+                <div className="bg-[#F0EAD2] rounded-2xl shadow-xl p-6 md:p-8 border border-[#6C584C]/20">
+                    {/* Header */}
+                    <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                        {/* Profile Pic */}
+                        <div className="relative">
+                            <div className="w-28 h-28 rounded-full bg-[#6C584C] flex items-center justify-center text-white text-4xl font-bold border-4 border-[#38B000] shadow-lg">
+                                {profile.profilePic ? (
+                                    <img
+                                        src={profile.profilePic}
+                                        alt="Profile"
+                                        className="w-full h-full rounded-full object-cover"
+                                    />
+                                ) : (
+                                    profile.name.charAt(0).toUpperCase()
+                                )}
+                            </div>
+                            {isEditing && (
+                                <label className="absolute bottom-1 right-1 bg-[#38B000] p-2 rounded-full shadow-md hover:bg-[#2E8B00] transition cursor-pointer">
+                                    <Camera size={16} className="text-white" />
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handlePhotoChange}
+                                        className="hidden"
+                                    />
+                                </label>
                             )}
                         </div>
-                        <div className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-white shadow-md border border-black/10">
-                            <Camera className="w-4 h-4" style={{ color: COLOR.primary }} />
+
+                        {/* Info */}
+                        <div className="flex-1 text-center md:text-left">
+                            <h2 className="text-2xl font-bold text-[#141414]">
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        value={formData.name || ""}
+                                        onChange={(e) => handleInputChange("name", e.target.value)}
+                                        className="bg-transparent border-b-2 border-[#38B000] outline-none text-center md:text-left"
+                                    />
+                                ) : (
+                                    profile.name
+                                )}
+                            </h2>
+                            <p className="text-[#6C584C] capitalize flex items-center justify-center md:justify-start gap-1 mt-1">
+                                <Shield size={16} /> {profile.type} Account
+                            </p>
                         </div>
-                    </label>
-                </div>
 
-                {/* profile card */}
-                <section className={`${style.card} p-6 space-y-5`}>
-                    <h2 className="text-lg font-semibold" style={{ color: COLOR.ink }}>
-                        Personal Information
-                    </h2>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <InputGroup
-                            icon={<User size={18} />}
-                            value={name}
-                            onChange={setName}
-                            placeholder="Full Name"
-                            disabled={!isEditing}
-                        />
-                        <InputGroup
-                            icon={<Mail size={18} />}
-                            value={email}
-                            onChange={setEmail}
-                            placeholder="Email Address"
-                            type="email"
-                            disabled={!isEditing}
-                        />
-                        <InputGroup
-                            icon={<Phone size={18} />}
-                            value={phone}
-                            onChange={setPhone}
-                            placeholder="Primary Phone"
-                            disabled={!isEditing}
-                        />
-                        <InputGroup
-                            icon={<Phone size={18} />}
-                            value={phone2}
-                            onChange={setPhone2}
-                            placeholder="Alternate Phone (optional)"
-                            disabled={!isEditing}
-                        />
-
-                        <div className="md:col-span-2">
-                            <Button
-                                onClick={togglePasswordForm}
-                                variant="outline"
-                                className="gap-2 w-full md:w-auto"
-                                style={{ borderColor: COLOR.muted, color: COLOR.muted }}
+                        {/* Action Buttons */}
+                        <div className="flex gap-3 flex-wrap justify-center">
+                            {isEditing ? (
+                                <>
+                                    <button
+                                        onClick={handleSave}
+                                        className="flex items-center gap-2 bg-[#38B000] text-white px-4 py-2 rounded-xl shadow hover:bg-[#2E8B00] transition"
+                                    >
+                                        <Save size={18} /> Save
+                                    </button>
+                                    <button
+                                        onClick={() => setIsEditing(false)}
+                                        className="flex items-center gap-2 bg-[#6C584C] text-white px-4 py-2 rounded-xl shadow hover:bg-[#4e4237] transition"
+                                    >
+                                        <X size={18} /> Cancel
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="flex items-center gap-2 bg-[#38B000] text-white px-4 py-2 rounded-xl shadow hover:bg-[#2E8B00] transition"
+                                >
+                                    <User size={18} /> Edit Profile
+                                </button>
+                            )}
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-2 bg-[#6C584C] text-white px-4 py-2 rounded-xl shadow hover:bg-[#4e4237] transition"
                             >
-                                <Lock size={16} />
-                                {showPasswordForm
-                                    ? "Cancel Password Change"
-                                    : "Change Password"}
-                            </Button>
+                                <LogOut size={18} /> Logout
+                            </button>
+                        </div>
+                    </div>
 
-                            {showPasswordForm && (
-                                <div className="mt-4 p-4 rounded-lg bg-white/50 space-y-4">
-                                    <h3 className="font-medium" style={{ color: COLOR.ink }}>
+                    {/* Info Fields */}
+                    <div className="mt-8 grid gap-6">
+                        {[
+                            { label: "Email", value: "email", icon: <Mail size={18} /> },
+                            { label: "Phone", value: "phone", icon: <Phone size={18} /> },
+                            { label: "Address", value: "address", icon: <MapPin size={18} /> },
+                        ].map((field) => (
+                            <div key={field.value}>
+                                <label className="block text-sm font-medium text-[#6C584C] mb-1">
+                                    {field.label}
+                                </label>
+                                {isEditing ? (
+                                    <div className="flex items-center gap-2 bg-white rounded-xl border border-[#6C584C]/20 px-4 py-3">
+                                        {field.icon}
+                                        <input
+                                            type="text"
+                                            value={(formData as any)[field.value] || ""}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    field.value as keyof ProfileData,
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="flex-1 outline-none text-[#141414] bg-transparent"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-2 bg-white rounded-xl border border-[#6C584C]/20 px-4 py-3 text-[#141414]">
+                                        {field.icon}
+                                        <span className="flex-1">{(profile as any)[field.value]}</span>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+
+                        {/* Password Section */}
+                        <div>
+                            <label className="block text-sm font-medium text-[#6C584C] mb-1">
+                                Password
+                            </label>
+                            {isChangingPassword ? (
+                                <div className="space-y-4 bg-white rounded-xl border border-[#6C584C]/20 p-4">
+                                    <div className="flex items-center gap-2">
+                                        <Lock size={18} className="text-[#6C584C]" />
+                                        <input
+                                            type={showPassword.current ? "text" : "password"}
+                                            placeholder="Current Password"
+                                            value={passwordData.currentPassword}
+                                            onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
+                                            className="flex-1 outline-none text-[#141414] bg-transparent"
+                                        />
+                                        <button
+                                            onClick={() => setShowPassword({ ...showPassword, current: !showPassword.current })}
+                                            className="text-[#6C584C] hover:text-[#38B000]"
+                                        >
+                                            {showPassword.current ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        </button>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <Lock size={18} className="text-[#6C584C]" />
+                                        <input
+                                            type={showPassword.new ? "text" : "password"}
+                                            placeholder="New Password"
+                                            value={passwordData.newPassword}
+                                            onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
+                                            className="flex-1 outline-none text-[#141414] bg-transparent"
+                                        />
+                                        <button
+                                            onClick={() => setShowPassword({ ...showPassword, new: !showPassword.new })}
+                                            className="text-[#6C584C] hover:text-[#38B000]"
+                                        >
+                                            {showPassword.new ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        </button>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <Lock size={18} className="text-[#6C584C]" />
+                                        <input
+                                            type={showPassword.confirm ? "text" : "password"}
+                                            placeholder="Confirm New Password"
+                                            value={passwordData.confirmPassword}
+                                            onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
+                                            className="flex-1 outline-none text-[#141414] bg-transparent"
+                                        />
+                                        <button
+                                            onClick={() => setShowPassword({ ...showPassword, confirm: !showPassword.confirm })}
+                                            className="text-[#6C584C] hover:text-[#38B000]"
+                                        >
+                                            {showPassword.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        </button>
+                                    </div>
+
+                                    <div className="flex gap-3 mt-4">
+                                        <button
+                                            onClick={handlePasswordSave}
+                                            className="flex items-center gap-2 bg-[#38B000] text-white px-4 py-2 rounded-xl shadow hover:bg-[#2E8B00] transition"
+                                        >
+                                            <Save size={18} /> Save Password
+                                        </button>
+                                        <button
+                                            onClick={() => setIsChangingPassword(false)}
+                                            className="flex items-center gap-2 bg-[#6C584C] text-white px-4 py-2 rounded-xl shadow hover:bg-[#4e4237] transition"
+                                        >
+                                            <X size={18} /> Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2 bg-white rounded-xl border border-[#6C584C]/20 px-4 py-3 text-[#141414]">
+                                    <Lock size={18} />
+                                    <span className="flex-1">••••••••</span>
+                                    <button
+                                        onClick={() => setIsChangingPassword(true)}
+                                        className="text-[#38B000] hover:text-[#2E8B00] font-medium"
+                                    >
                                         Change Password
-                                    </h3>
-                                    <InputGroup
-                                        icon={<Lock size={18} />}
-                                        value=""
-                                        onChange={() => { }}
-                                        placeholder="Current Password"
-                                        type="password"
-                                    />
-                                    <InputGroup
-                                        icon={<Lock size={18} />}
-                                        value=""
-                                        onChange={() => { }}
-                                        placeholder="New Password"
-                                        type="password"
-                                    />
-                                    <InputGroup
-                                        icon={<Lock size={18} />}
-                                        value=""
-                                        onChange={() => { }}
-                                        placeholder="Confirm New Password"
-                                        type="password"
-                                    />
-                                    <Button className={style.accent}>Update Password</Button>
+                                    </button>
                                 </div>
                             )}
                         </div>
                     </div>
-                </section>
+                </div>
 
-                {/* addresses card */}
-                <section className={`${style.card} p-6`}>
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className={`font-semibold ${style.textPrimary}`}>
-                            Saved Addresses
-                        </h3>
-                        {isEditing && (
-                            <Button
-                                size="sm"
-                                className={`${style.accent} gap-2`}
-                                onClick={addAddress}
-                            >
-                                <Plus className="w-4 h-4" /> Add Address
-                            </Button>
-                        )}
+                {/* Additional Info Section */}
+                <div className="bg-[#F0EAD2] rounded-2xl shadow-xl p-6 md:p-8 border border-[#6C584C]/20 mt-6">
+                    <h3 className="text-xl font-bold text-[#141414] mb-4">Account Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-xl p-4">
+                            <p className="text-sm text-[#6C584C]">Account Type</p>
+                            <p className="font-medium text-[#141414] capitalize">{profile.type}</p>
+                        </div>
+                        <div className="bg-white rounded-xl p-4">
+                            <p className="text-sm text-[#6C584C]">Member Since</p>
+                            <p className="font-medium text-[#141414]">January 2023</p>
+                        </div>
+                        <div className="bg-white rounded-xl p-4">
+                            <p className="text-sm text-[#6C584C]">Last Updated</p>
+                            <p className="font-medium text-[#141414]">2 days ago</p>
+                        </div>
+                        <div className="bg-white rounded-xl p-4">
+                            <p className="text-sm text-[#6C584C]">Status</p>
+                            <p className="font-medium text-[#38B000]">Active</p>
+                        </div>
                     </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        {addresses.map((addr, idx) => (
-                            <AddressBlock
-                                key={idx}
-                                data={addr}
-                                onChange={(f, v) => updateAddress(idx, f, v)}
-                                onRemove={() => removeAddress(idx)}
-                                editable={isEditing}
-                            />
-                        ))}
-                    </div>
-                </section>
-
-                {/* mobile logout */}
-                <div className="md:hidden">
-                    <Button
-                        variant="outline"
-                        className="w-full gap-2"
-                        style={{ borderColor: COLOR.muted, color: COLOR.muted }}
-                    >
-                        <LogOut size={16} /> Logout
-                    </Button>
-                </div>
-            </main>
-        </div>
-    );
-}
-
-/* ---------- sub-components ---------- */
-function InputGroup(props: {
-    icon: React.ReactNode;
-    value: string;
-    onChange: (v: string) => void;
-    placeholder: string;
-    type?: string;
-    disabled?: boolean;
-}) {
-    return (
-        <div className="relative">
-            <span
-                className="absolute left-3 top-1/2 -translate-y-1/2"
-                style={{ color: COLOR.muted }}
-            >
-                {props.icon}
-            </span>
-            <input
-                type={props.type ?? "text"}
-                value={props.value}
-                onChange={(e) => props.onChange(e.target.value)}
-                placeholder={props.placeholder}
-                disabled={props.disabled}
-                className={`w-full pl-10 pr-3 py-2.5 rounded-lg ${style.border} ${style.textPrimary
-                    } ${style.focus} transition-all ${props.disabled ? "bg-white/50 opacity-80" : "bg-white"
-                    }`}
-            />
-        </div>
-    );
-}
-
-function AddressBlock(props: {
-    data: Address;
-    onChange: (field: keyof Address, value: string) => void;
-    onRemove: () => void;
-    editable: boolean;
-}) {
-    const { data, onChange, onRemove, editable } = props;
-    return (
-        <div
-            className={`p-4 rounded-xl border ${style.border
-                } bg-white/70 space-y-3 relative transition-all ${editable ? "ring-2 ring-[#38B000]/20" : ""
-                }`}
-        >
-            {editable && (
-                <button
-                    onClick={onRemove}
-                    className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-black/5 transition-colors"
-                    aria-label="Remove address"
-                >
-                    <Trash className="w-4 h-4" style={{ color: COLOR.muted }} />
-                </button>
-            )}
-
-            <Label icon={<Home size={16} />} text="Locality / Street" />
-            <input
-                value={data.locality}
-                onChange={(e) => onChange("locality", e.target.value)}
-                placeholder="e.g. Andheri East"
-                disabled={!editable}
-                className={`w-full px-3 py-2 rounded-lg ${style.border} ${style.textPrimary
-                    } ${style.focus} transition-all ${!editable ? "bg-transparent border-transparent" : "bg-white"
-                    }`}
-            />
-
-            <div className="grid grid-cols-2 gap-3">
-                <div>
-                    <Label icon={<Building size={16} />} text="City" />
-                    <input
-                        value={data.city}
-                        onChange={(e) => onChange("city", e.target.value)}
-                        placeholder="Mumbai"
-                        disabled={!editable}
-                        className={`w-full px-3 py-2 rounded-lg ${style.border} ${style.textPrimary
-                            } ${style.focus} transition-all ${!editable ? "bg-transparent border-transparent" : "bg-white"
-                            }`}
-                    />
-                </div>
-                <div>
-                    <Label icon={<MapPin size={16} />} text="State" />
-                    <input
-                        value={data.state}
-                        onChange={(e) => onChange("state", e.target.value)}
-                        placeholder="Maharashtra"
-                        disabled={!editable}
-                        className={`w-full px-3 py-2 rounded-lg ${style.border} ${style.textPrimary
-                            } ${style.focus} transition-all ${!editable ? "bg-transparent border-transparent" : "bg-white"
-                            }`}
-                    />
-                </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-                <div>
-                    <Label text="Pin Code" />
-                    <input
-                        value={data.pin}
-                        onChange={(e) => onChange("pin", e.target.value)}
-                        placeholder="400069"
-                        disabled={!editable}
-                        className={`w-full px-3 py-2 rounded-lg ${style.border} ${style.textPrimary
-                            } ${style.focus} transition-all ${!editable ? "bg-transparent border-transparent" : "bg-white"
-                            }`}
-                    />
-                </div>
-                <div>
-                    <Label text="Landmark" />
-                    <input
-                        value={data.landmark}
-                        onChange={(e) => onChange("landmark", e.target.value)}
-                        placeholder="Near Metro Station"
-                        disabled={!editable}
-                        className={`w-full px-3 py-2 rounded-lg ${style.border} ${style.textPrimary
-                            } ${style.focus} transition-all ${!editable ? "bg-transparent border-transparent" : "bg-white"
-                            }`}
-                    />
                 </div>
             </div>
         </div>
     );
-}
+};
 
-function Label(props: { icon?: React.ReactNode; text: string }) {
-    return (
-        <div
-            className={`flex items-center gap-2 text-xs font-semibold ${style.textSecondary} mb-1`}
-        >
-            {props.icon}
-            <span>{props.text}</span>
-        </div>
-    );
-}
+export default Profile;
