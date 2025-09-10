@@ -7,11 +7,12 @@ import {
     Star,
     User,
     Users,
-    Building2,
     ClipboardPlus,
     Settings,
     Menu,
     X,
+    Upload,
+    History
 } from "lucide-react";
 
 interface SideBar {
@@ -28,15 +29,26 @@ const userSidebarContent: Array<SideBar> = [
 ];
 
 const adminSidebarContent: Array<SideBar> = [
-    { title: "All Bookings", path: "all-bookings", icon: <Users size={20} /> },
+    { title: "Bookings", path: "current-bookings", icon: <Users size={20} /> },
     { title: "All Users", path: "all-users", icon: <Users size={20} /> },
-    { title: "Assign Task", path: "assign-task", icon: <ClipboardPlus size={20} /> },
+    { title: "Past Bookings", path: "past-bookings", icon: <ClipboardPlus size={20} /> },
     { title: "Add Management", path: "add-management", icon: <Settings size={20} /> },
     { title: "Profile", path: "profile/:id", icon: <User size={20} /> },
 ];
 
-const orgSidebarContent: Array<SideBar> = [...userSidebarContent];
-const empSidebarContent: Array<SideBar> = [...userSidebarContent];
+const orgSidebarContent: Array<SideBar> = [
+    { title: "Book Now", path: "book-now", icon: <Home size={20} /> },
+    { title: "My Bookings", path: "my-bookings", icon: <CalendarCheck size={20} /> },
+    { title: "Reviews", path: "my-reviews", icon: <Star size={20} /> },
+    { title: "Profile", path: "profile/:id", icon: <User size={20} /> },
+];
+
+
+export const empSidebarContent: Array<SideBar> = [
+    { title: "My Tasks", path: "tasks/assigned", icon: <ClipboardList size={20} /> },
+    { title: "Past Works", path: "tasks/in-progress", icon: <ClipboardList size={20} /> },
+    { title: "Profile", path: "profile/:id", icon: <User size={20} /> },
+];
 
 type UserRole = "user" | "admin" | "org" | "emp";
 

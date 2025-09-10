@@ -10,13 +10,13 @@ import Sidebar from "./Sidebar";
 
 //admin routes
 
-import AddManagement from "./AddManagement";
-import BookingManager from "./AllBookings";
 
-
+import Reviews from "./Reviews";
 
 
 import CommonDashboard from "./Dashboard/CommonDashboard";
+
+import AssignTask from "./AssignTask";
 
 export {
     UserDashboard,
@@ -27,12 +27,11 @@ export {
     SignUp,
     Sidebar,
 
+    CommonDashboard,
 
-    AddManagement,
-    BookingManager,
+ 
     
 
-
-
-    CommonDashboard
+    Reviews,
+    AssignTask
 }
