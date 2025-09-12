@@ -7,16 +7,10 @@ import SignUp from "./Signup";
 
 import Sidebar from "./Sidebar";
 
-
 //admin routes
-
-
-import Reviews from "./Reviews";
-
-
+import MyReviews from "./Reviews";
 import CommonDashboard from "./Dashboard/CommonDashboard";
-
-import AssignTask from "./AssignTask";
+import MyBookings from "./MyBookings";
 
 export {
     UserDashboard,
@@ -26,12 +20,7 @@ export {
     SignIn,
     SignUp,
     Sidebar,
-
     CommonDashboard,
-
- 
-    
-
-    Reviews,
-    AssignTask
+    MyReviews,
+    MyBookings
 }

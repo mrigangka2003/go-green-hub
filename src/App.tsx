@@ -13,10 +13,14 @@ import {
   AllUsers,
   AddManagement,
   Profile,
-  BookNow
+  BookNow,
+  PastBookings,
+  MyBookingsPage,
+  EmployeeTaskPage
 } from "./pages"
 import DashboardLayout from "./components/layouts/DashboardLayout";
-import { AdminDashboard, AssignTask, CommonDashboard, EmployeeDashboard, OrgDashboard, Reviews, Sidebar, UserDashboard } from "./components";
+import { AdminDashboard, CommonDashboard, EmployeeDashboard, OrgDashboard, MyReviews, Sidebar, UserDashboard } from "./components";
+
 
 
 const queryClient = new QueryClient();
@@ -35,7 +39,7 @@ const App = () => (
             <Route index element={<AdminDashboard />} />
             <Route path="current-bookings" element={<CurrentBookingsPage/>} />
             <Route path="all-users" element={<AllUsers/>} />
-            <Route path="assign-task" element={<BookNow />} />
+            <Route path="past-bookings" element={<PastBookings />} />
             <Route path="add-management" element={<AddManagement />} />
             <Route path="profile/:id" element={<Profile />} />
           </Route>
@@ -43,8 +47,8 @@ const App = () => (
           <Route path="user-dashboard" element={<DashboardLayout />}>
             <Route index element={<CommonDashboard />} />
             <Route path="book-now" element={<BookNow />} />
-            <Route path="my-bookings" element={<BookNow />} />
-            <Route path="my-reviews" element={<Reviews />} />
+            <Route path="my-bookings" element={<MyBookingsPage/>} />
+            <Route path="my-reviews" element={<MyReviews userId="U101" />} />
             <Route path="profile/:id" element={<Profile />} />
           </Route>
 
@@ -52,17 +56,17 @@ const App = () => (
           <Route path="/org-dashboard" element={<DashboardLayout />}>
             <Route index element={<CommonDashboard />} />
             <Route path="book-now" element={<BookNow />} />
-            <Route path="my-bookings" element={<BookNow />} />
-            <Route path="my-reviews" element={<Reviews />} />
+            <Route path="my-bookings" element={<MyBookingsPage/>} />
+            <Route path="my-reviews" element={<MyReviews userId="U101" />} />
             <Route path="profile/:id" element={<Profile />} />
           </Route>
 
 
           <Route path="/emp-dashboard" element={<DashboardLayout />}>
             <Route index element={<CommonDashboard />} />
-            <Route path="tasks/assigned" element={<AssignTask />} />
+            <Route path="tasks/assigned" element={<EmployeeTaskPage />} />
             <Route path="my-bookings" element={<BookNow />} />
-            <Route path="my-reviews" element={<Reviews />} />
+            <Route path="my-reviews" element={<MyReviews userId="U101"/>} />
             <Route path="profile/:id" element={<Profile />} />
           </Route>
 

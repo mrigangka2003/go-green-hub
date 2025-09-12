@@ -7,7 +7,9 @@ import NotFound from "./NotFound";
 import CurrentBookingsPage from "./CurrentBookings";
 import AllUsers from "./AllUsers";
 import AddManagement from "./AddManagement";
-
+import PastBookings from "./AdminPastBookings";
+import MyBookingsPage from "./MyBookingsPage";
+import EmployeeTaskPage from "./EmpTaskPage";
 
 export {
     Auth,
@@ -19,8 +21,10 @@ export {
     CurrentBookingsPage,
     AllUsers,
     AddManagement,
-
+    PastBookings,
 
     //user
-    BookNow
+    BookNow,
+    MyBookingsPage,
+    EmployeeTaskPage
 }
